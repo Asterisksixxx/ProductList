@@ -1,86 +1,50 @@
 import { Product } from "@/features/products/types";
-import { useState } from "react";
 import { Alert, FlatList, StyleSheet } from "react-native";
-import uuid from "react-native-uuid";
+import { productStorage } from "../../../share/lib/services/productStorage";
 import ItemProduct from "./itemProduct";
 
-type ListProductProps = {};
+type ListProductProps = {
+  listProducts: Product[];
+  onDelete: () => void;
+  onChange: (oldProduct: Product) => void;
+};
 
-const ListProduct = ({}: ListProductProps) => {
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: uuid.v4(),
-      category: "Мясная продукция",
-      name: "Колбаса",
-      description: "Вареная колбаса с сальцем",
-      scaling: "килограмм",
-      price: 1.4,
-      quantity: 1,
-    },
-    {
-      id: uuid.v4(),
-      category: "Мясная продукция",
-      name: "Курица",
-      description: "Тушка цельная",
-      scaling: "килограмм",
-      price: 1.2,
-      quantity: 2.2,
-    },
-    {
-      id: uuid.v4(),
-      category: "Хлебо-булочные изделия",
-      name: "Батон",
-      description: "На молоке",
-      scaling: "единица",
-      price: 0.4,
-      quantity: 3,
-    },
-    {
-      id: uuid.v4(),
-      category: "Овощи и фрукты",
-      name: "Бананы",
-      description: "По акции",
-      scaling: "килограмм",
-      price: 1.3,
-      quantity: 2,
-    },
-    {
-      id: uuid.v4(),
-      category: "Молочная продукция",
-      name: "Йогурт",
-      description: "ТОП шоколадный",
-      scaling: "литр",
-      price: 3,
-      quantity: 0.45,
-    },
-    {
-      id: uuid.v4(),
-      category: "Вода и напитки",
-      name: "Аливария бархатное",
-      description: "1.9 литра вкусного пива",
-      scaling: "литр",
-      price: 2,
-      quantity: 1.9,
-    },
-  ]);
-
+const ListProduct = ({
+  listProducts = [],
+  onDelete,
+  onChange,
+}: ListProductProps) => {
   const handleDeleteProduct = (id: string) => {
-    const productToDelete = products.find((p) => p.id === id);
-
-    Alert.alert(
-      "Удалить продукт",
-      `Точно удалить "${productToDelete?.name || "продукт"}"?`,
-      [
-        { text: "Отмена", style: "cancel" },
-        {
-          text: "Удалить",
-          style: "default",
-          onPress: () => {
-            setProducts((list) => list.filter((p) => p.id !== id));
-          },
-        },
-      ],
+    productStorage.delete(id);
+    const productToDelete: Product | undefined = listProducts.find(
+      (item) => item.id === id,
     );
+
+    if (productToDelete) {
+      Alert.alert(
+        "Удалить продукт",
+        `Точно удалить "${productToDelete.name || "продукт"}"?`,
+        [
+          { text: "Отмена", style: "cancel" },
+          {
+            text: "Удалить",
+            style: "default",
+            onPress: () => {
+              onDelete();
+            },
+          },
+        ],
+      );
+    }
+  };
+
+  const handleChangeProduct = (id: string) => {
+    const productToUpdate: Product | undefined = listProducts.find(
+      (item) => item.id === id,
+    );
+    if (productToUpdate) {
+      onChange(productToUpdate);
+    }
   };
 
   return (
@@ -88,7 +52,7 @@ const ListProduct = ({}: ListProductProps) => {
       scrollEnabled={true}
       style={styles.listProduct}
       contentContainerStyle={styles.listProductContainer}
-      data={products}
+      data={listProducts}
       renderItem={({ item }) => (
         <ItemProduct
           id={item.id}
@@ -99,6 +63,7 @@ const ListProduct = ({}: ListProductProps) => {
           price={item.price}
           quantity={item.quantity}
           onDelete={handleDeleteProduct}
+          onChange={handleChangeProduct}
         ></ItemProduct>
       )}
     />

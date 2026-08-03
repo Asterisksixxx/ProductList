@@ -1,17 +1,17 @@
-import IconInterface from "@/assets/images/interfaceicons";
 import { useState } from "react";
 import { Animated, Pressable, StyleSheet } from "react-native";
+import IconInterface from "../../../../share/lib/assets/icons/interfaceicons";
 
 type ProductButtonProps = {
   type: "normal" | "alert";
   content: "text" | "icon";
   iconBack: "BACK";
-  iconChange: "CHANGE";
+  iconChange: "CHANGE" | "PEN";
   iconDelete: "DELETE";
   text?: string;
   icon?: "SETTING";
   onDelete: () => void;
-  // onChange: () => void;
+  onChange: () => void;
 };
 
 const isVisible: boolean = false;
@@ -22,10 +22,10 @@ const ProductButton = ({
   text = "",
   icon = "SETTING",
   iconBack = "BACK",
-  iconChange = "CHANGE",
+  iconChange = "PEN",
   iconDelete = "DELETE",
   onDelete,
-  // onChange,
+  onChange,
 }: ProductButtonProps) => {
   const IconButton = IconInterface[icon];
   const IconButtonDelete = IconInterface[iconDelete];
@@ -41,6 +41,13 @@ const ProductButton = ({
   const handleDelete = () => {
     if (onDelete) {
       onDelete();
+    }
+    setIsVisible(false);
+  };
+
+  const handleChange = () => {
+    if (onChange) {
+      onChange();
     }
     setIsVisible(false);
   };
@@ -72,7 +79,7 @@ const ProductButton = ({
                 <IconButtonDelete width={35} height={35} color="#000000" />
               ) : null}
             </Pressable>
-            <Pressable style={styles.button}>
+            <Pressable style={styles.button} onPress={handleChange}>
               {IconButtonChange ? (
                 <IconButtonChange width={25} height={25} color="#000000" />
               ) : null}

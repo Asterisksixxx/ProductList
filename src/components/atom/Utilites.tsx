@@ -3,12 +3,16 @@ import UtiliteButton from "../proton/utilite/utiliteButton";
 import UtiliteContainer from "../proton/utilite/utiliteContainer";
 
 type UtilitesProps = {
-  amountValute: "Итого $:" | "Итого BYN:" | "Итого EUR:";
+  amountText: string;
+  amountValue: string;
+  amountValute: string;
   onPressAdd: () => void;
 };
 
 const Utilites = ({
-  amountValute = "Итого BYN:",
+  amountText = "Итого BYN:",
+  amountValue = "",
+  amountValute = "",
   onPressAdd,
 }: UtilitesProps) => {
   return (
@@ -16,8 +20,9 @@ const Utilites = ({
       <View style={styles.body}>
         <View style={styles.container}>
           <UtiliteContainer position="left">
-            <Text style={styles.amountValute}>{amountValute}</Text>
-            <Text style={styles.amountValue}>73</Text>
+            <Text style={styles.amountText}>
+              {amountText} {amountValue} {amountValute}
+            </Text>
           </UtiliteContainer>
           <UtiliteContainer position="right">
             <UtiliteButton typeTitle="icon" icon="FILTER"></UtiliteButton>
@@ -42,8 +47,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   amount: {},
-  amountValute: { color: "#0000" },
-  amountValue: { color: "#0000" },
+  amountText: { color: "#0000" },
   columnNames: {},
 });
 

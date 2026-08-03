@@ -17,3 +17,9 @@ export type Category =
   | "Сладкое, конфеты, печенье";
 
 export type Scaling = "килограмм" | "единица" | "литр";
+
+export type Valute =
+  | { name: "EUR"; symbol: "€" }
+  | { name: "USD"; symbol: "$" }
+  | { name: "BYN"; symbol: "Б" }
+  | { name: "RUB"; symbol: "₽" };

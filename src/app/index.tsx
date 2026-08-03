@@ -1,12 +1,46 @@
 import ListProduct from "@/components/atom/listProduct";
 import Utilites from "@/components/atom/Utilites";
-import { useState } from "react";
+import { Product, Valute } from "@/features/products/types";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ModalCreate from "./../components/molecule/modalCreate";
+import { productStorage } from "../../share/lib/services/productStorage";
+import { valuteStorage } from "../../share/lib/services/valuteStorage";
+import ModalProduct from "../components/molecule/modalProduct";
 
 export default function HomeScreen() {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState<boolean>(false);
+  const [willCreate, setWillCreate] = useState<boolean>(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  const [products, setProducts] = useState<Product[]>([]);
+  const [amount, setAmount] = useState<number>(0);
+  const [valute, setValute] = useState<Valute>({ name: "EUR", symbol: "€" });
+
+  const loadData = async () => {
+    const data = await productStorage.get();
+    const valute = await valuteStorage.get();
+    setValute(valute);
+    setProducts(data);
+  };
+
+  useEffect(() => {
+    const sum: number = products.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0,
+    );
+    setAmount(sum);
+  }, [products]);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleEditProduct = (product: Product) => {
+    setEditingProduct(product);
+    setWillCreate(false);
+    setVisible(true);
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -15,15 +49,29 @@ export default function HomeScreen() {
           <View style={styles.header}>
             <Text style={styles.headerTitle}>Список покупок</Text>
             <Utilites
-              onPressAdd={() => setVisible(true)}
-              amountValute="Итого $:"
+              onPressAdd={() => {
+                setVisible(true);
+                setWillCreate(true);
+              }}
+              amountText="Итого:"
+              amountValue={amount.toFixed(2)}
+              amountValute={valute.symbol}
             ></Utilites>
           </View>
-          <ListProduct></ListProduct>
-          <ModalCreate
-            onPressClose={() => setVisible(false)}
+          <ListProduct
+            listProducts={products}
+            onDelete={loadData}
+            onChange={handleEditProduct}
+          ></ListProduct>
+          <ModalProduct
+            onPressClose={() => {
+              setVisible(false);
+              loadData();
+            }}
+            willCreate={willCreate}
+            oldProduct={editingProduct}
             visible={visible}
-          ></ModalCreate>
+          ></ModalProduct>
         </View>
       </View>
     </SafeAreaView>

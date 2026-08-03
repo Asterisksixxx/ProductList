@@ -1,11 +1,17 @@
-import { Product } from "@/features/products/types";
+import { Product, Valute } from "@/features/products/types";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import IconCategory from "../../../assets/images/categoryicons/index";
+import IconCategory from "../../../share/lib/assets/icons/categoryicons/index";
+import { valuteStorage } from "../../../share/lib/services/valuteStorage";
 import ProductButton from "../proton/product/productButton";
 
 const calculateAmount = (quantity: number, price: number): string => {
   const amount = (quantity * price).toFixed(2);
   return amount;
+};
+
+type ItemProductProps = {
+  onChange: () => void;
 };
 
 const ItemProduct = ({
@@ -17,16 +23,35 @@ const ItemProduct = ({
   scaling = "килограмм",
   price = 1,
   onDelete,
-}: Product & { onDelete?: (id: string) => void }) => {
+  onChange,
+}: Product & {
+  onDelete?: (id: string) => void;
+  onChange?: (id: string) => void;
+}) => {
   const amount = calculateAmount(quantity, price);
 
   const CategoryIcon = IconCategory[category];
+
+  const [valute, setValute] = useState<Valute>({ name: "BYN", symbol: "Б" });
+
+  useEffect(() => {
+    const loadValute = async () => {
+      setValute(await valuteStorage.get());
+    };
+    loadValute();
+  }, []);
 
   const handleDelete = () => {
     if (onDelete) {
       onDelete(id);
     }
   };
+  const handleChange = () => {
+    if (onChange) {
+      onChange(id);
+    }
+  };
+
   return (
     <>
       <View style={styles.body}>
@@ -44,7 +69,8 @@ const ItemProduct = ({
             <View style={styles.productFooter}>
               <View style={styles.productParams}>
                 <Text>
-                  Купить {quantity} {scaling} по {price} = {amount}
+                  Купить {quantity} {scaling} по {price} {valute.symbol} ={" "}
+                  {amount} {valute.symbol}
                 </Text>
               </View>
               <View style={styles.productActions}>
@@ -56,6 +82,7 @@ const ItemProduct = ({
                   iconBack="BACK"
                   iconDelete="DELETE"
                   onDelete={handleDelete}
+                  onChange={handleChange}
                 ></ProductButton>
               </View>
             </View>

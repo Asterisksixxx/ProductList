@@ -1,5 +1,5 @@
-import IconInterface from "@/assets/images/interfaceicons";
 import { Pressable, StyleSheet, Text } from "react-native";
+import IconInterface from "../../../../share/lib/assets/icons/interfaceicons";
 
 type UtiliteButtonProps = {
   typeTitle: "text" | "icon" | "nothing";
